@@ -11,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.MediaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,6 +33,9 @@ class SecurityTests {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -65,5 +70,20 @@ class SecurityTests {
     void invalidCredentialsFail() throws Exception {
         mvc.perform(get("/properties").with(httpBasic("user", "wrong")))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void canCreateUserWithoutAuthentication() throws Exception {
+        Agency agency = agencyRepository.findAll().getFirst();
+        User newUser = new User();
+        newUser.setUsername("newuser");
+        newUser.setPassword("newpass");
+        newUser.setAgency(agency);
+
+        mvc.perform(
+                org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newUser))
+        ).andExpect(status().isCreated());
     }
 }
