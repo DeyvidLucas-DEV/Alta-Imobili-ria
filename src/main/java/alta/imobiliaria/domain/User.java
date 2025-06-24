@@ -4,15 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 
 import alta.imobiliaria.domain.Agency;
 
 @Data
 @Entity
 @Table(name = "users")
-@FilterDef(name = "agencyFilter", parameters = @ParamDef(name = "agencyId", type = Long.class))
 @Filter(name = "agencyFilter", condition = "agency_id = :agencyId")
 public class User {
     @Id
