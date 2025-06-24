@@ -1,7 +1,9 @@
 package alta.imobiliaria;
 
 import alta.imobiliaria.domain.User;
+import alta.imobiliaria.domain.Agency;
 import alta.imobiliaria.repository.UserRepository;
+import alta.imobiliaria.repository.AgencyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +27,25 @@ class SecurityTests {
     private UserRepository repository;
 
     @Autowired
+    private AgencyRepository agencyRepository;
+
+    @Autowired
     private PasswordEncoder encoder;
 
     @BeforeEach
     void setUp() {
         repository.deleteAll();
+        agencyRepository.deleteAll();
+
+        Agency agency = new Agency();
+        agency.setName("Default");
+        agency.setDomain("localhost");
+        agency = agencyRepository.save(agency);
+
         User user = new User();
         user.setUsername("user");
         user.setPassword(encoder.encode("password"));
+        user.setAgency(agency);
         repository.save(user);
     }
 
